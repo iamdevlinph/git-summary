@@ -1,8 +1,8 @@
 {
   "name": "git-summary",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Summarizes multiple git repository status within a directory",
-  "main": "git-summary.js",
+  "main": "./git-summary.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

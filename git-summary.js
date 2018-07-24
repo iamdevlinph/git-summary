@@ -11,9 +11,10 @@ const installationDir = path.dirname(require.resolve('git-summary/package.json')
 const shell = require('shelljs');
 
 const run = (options = '',  path = workingDirectory) => {
-  if (!options) { // if there is no options. set options to be same as path
+  if (!options) { // if there are no options. set options to be same as path
     options = path;
   }
+  // console.log(`Executing: '${installationDir}/git-summary.sh ${options} ${path}'`)
   shell.exec(`${installationDir}/git-summary.sh ${options} ${path}`);
 }
 

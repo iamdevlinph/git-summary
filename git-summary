@@ -109,7 +109,7 @@ detect_OS() {
     echo 'Looks like linux'
     readlink_cmd="readlink"
     dirname_cmd="dirname"
-    gawk_cmd="gawk"  
+    gawk_cmd="gawk"
   elif [ "$(expr substr $OS 1 3)" == "Win" ]; then  # Windows
     echo 'Looks like windows - hope you have git bash or cygwin otherwise this wont work!'
     readlink_cmd="readlink"
