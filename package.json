@@ -1,0 +1,29 @@
+{
+  "name": "git-summary",
+  "version": "1.0.0",
+  "description": "Summarizes multiple git repository status within a directory",
+  "main": "git-summary.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "git-summary": "./git-summary.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamdevlinph/git-summary.git"
+  },
+  "keywords": [
+    "git",
+    "status"
+  ],
+  "author": "iamdevlinph@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iamdevlinph/git-summary/issues"
+  },
+  "homepage": "https://github.com/iamdevlinph/git-summary#readme",
+  "dependencies": {
+    "shelljs": "0.8.2"
+  }
+}
