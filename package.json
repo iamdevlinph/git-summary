@@ -1,6 +1,6 @@
 {
   "name": "git-summary",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Summarizes multiple git repository status within a directory",
   "main": "./git-summary.js",
   "scripts": {
