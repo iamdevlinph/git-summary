@@ -1,5 +1,10 @@
 ***Forked in order to allow it to work on Windows if using git bash, cygwin or equivalent***
 
+#### Installation
+```
+npm i -g git-summary
+```
+
 # git-summary
 **If you ever experienced one of the following situations, git-summary is for you.**
 
