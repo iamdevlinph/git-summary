@@ -11,13 +11,13 @@ GREEN='\e[0;32m'
 ORANGE='\e[0;33m'
 RED='\e[0;31m'
 PURPLE='\e[0;35m'
-NC='\e[0m' # No Color
+NC='\033[0m' # No Color
 
 usage() {
     sed 's/^        //' <<EOF
         git-summary - summarize git repos at some path
 
-        Usage: git-summary.sh [-h] [-l] [-d] [path]
+        Usage: git-summary.sh [-h] [-l] [-d] [-s] [path]
 
         Given a path to a folder containing one or more git repos,
         print a status summary table showing, for each repo:
@@ -47,6 +47,8 @@ usage() {
           -d    Deep lookup. Will search within the entire tree of the
                 current folder.
 
+          -s    Summary. Only print the number of things that need work
+
           path  Path to folder containing git repos; if omitted, the
                 current working directory is used.
 
@@ -56,19 +58,25 @@ EOF
 # Main
 git_summary() {
 
-    detect_OS
-
     local local_only=0
+    summary=0
+    todos=0
     local opt
     local deeplookup=0
-    while getopts "hld" opt; do
+
+
+    while getopts "hlds" opt; do
         case "${opt}" in
             h) usage ; exit 1 ;;
             l) local_only=1 ;;    # Will skip "git fetch"
             d) deeplookup=1 ;;
+            s) summary=1 ;; # Will only print summarized number of work
+            *) echo "Invalid flag."; usage; exit 1 ;;
         esac
     done
     shift $((OPTIND-1))
+
+    detect_OS
 
     # Use provided path, or default to pwd
     local target=$(${readlink_cmd} -f ${1:-`pwd`})
@@ -90,28 +98,42 @@ git_summary() {
     local max_repo_len=$(max_len "$repos")
     local max_branch_len=$(max_len "$branches")
     local template=$(printf "%%b%%-%ds %%-%ds %%5s" $max_repo_len $max_branch_len)
-    print_header "$template" $max_repo_len $max_branch_len
-
+    if [ $summary != 1 ]; then
+      print_header "$template" $max_repo_len $max_branch_len
+    fi
     local f
     for f in $repos ; do
         summarize_one_git_repo $f "$template" "$local_only" >&1
     done
+    if [ $summary == 1 ]; then
+      if [ $todos == 0 ]; then
+        printf "${GREEN}$todos${NC}" >&1
+      else
+        printf "${ORANGE}$todos${NC}" >&1
+      fi
+    fi
 }
 
 # Autodetect the OS
 detect_OS() {
   if [ "$(uname)" == "Darwin" ]; then  # macOS
-    echo 'Looks like a macOS'
+    if [ $summary != 1 ]; then
+      echo 'Looks like a macOS'
+    fi
     readlink_cmd="greadlink"
     dirname_cmd="gdirname"
     gawk_cmd="awk"
   elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then  # Linux
-    echo 'Looks like linux'
+    if [ $summary != 1 ]; then
+      echo 'Looks like linux'
+    fi
     readlink_cmd="readlink"
     dirname_cmd="dirname"
     gawk_cmd="gawk"
   elif [ "$(expr substr $OS 1 3)" == "Win" ]; then  # Windows
-    echo 'Looks like windows - hope you have git bash or cygwin otherwise this wont work!'
+    if [ $summary != 1 ]; then
+      echo 'Looks like windows - hope you have git bash or cygwin otherwise this wont work!'
+    fi
     readlink_cmd="readlink"
     dirname_cmd="dirname"
     gawk_cmd="gawk"
@@ -204,12 +226,18 @@ summarize_one_git_repo () {
     fi
 
     ### Print to stdout
-    if [ $numState -eq 0 ]; then
-      printf "$template\n" $GREEN $app_name $branch_name "$state$rstate" >&1
-    elif [ $numState -eq 1 ]; then
-      printf "$template\n" $ORANGE $app_name $branch_name "$state$rstate" >&1
-    elif [ $numState -eq 2 ]; then
-      printf "$template\n" $RED $app_name $branch_name "$state$rstate" >&1
+    if [ $summary == 1 ]; then
+      if [ $numState -ne 0 ]; then
+        todos=$((todos+1))
+      fi
+    else
+      if [ $numState -eq 0 ]; then
+        printf "$template\n" $GREEN $app_name $branch_name "$state$rstate" >&1
+      elif [ $numState -eq 1 ]; then
+        printf "$template\n" $ORANGE $app_name $branch_name "$state$rstate" >&1
+      elif [ $numState -eq 2 ]; then
+        printf "$template\n" $RED $app_name $branch_name "$state$rstate" >&1
+      fi
     fi
 }
 
